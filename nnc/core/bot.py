@@ -137,21 +137,21 @@ def nickname_in_use(bot, msg):
 def on_namreply(bot, msg):
     users = msg.params[-1].split()
     for user in users:
-        bot.channel.add_user(user)
+        bot.channel.add_user(user, msg.channel)
 
 
 @irc(cmd='KICK')
 def on_kick(bot, msg):
     kicked_user = msg.params[-1]
-    bot.channel.remove_user(kicked_user)
+    bot.channel.remove_user(kicked_user, msg.channel)
 
 
 @irc(cmd='QUIT')
 @irc(cmd='PART')
 def on_part(bot, msg):
-    bot.channel.remove_user(msg.nick)
+    bot.channel.remove_user(msg.nick, msg.channel)
 
 
 @irc(cmd='JOIN')
 def on_join(bot, msg):
-    bot.channel.add_user(msg.nick)
+    bot.channel.add_user(msg.nick, msg.channel)

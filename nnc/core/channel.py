@@ -1,13 +1,16 @@
 
 
 class Channel:
-    def __init__(self, channel):
-        self.channel = channel
+    def __init__(self, channels):
+        self.channels = {}
         self.users_online = set()
 
-    def add_user(self, user):
-        self.users_online.add(user)
+        for channel in channels:
+            self.channels[channel] = set()
 
-    def remove_user(self, user):
-        self.users_online.discard(user)
+    def add_user(self, user, channel):
+        self.channels[channel].add(user)
+
+    def remove_user(self, user, channel):
+        self.channels[channel].discard(user)
 
