@@ -164,6 +164,9 @@ def on_part(bot, msg):
 def on_nickname_change(bot, msg):
     old_nick = msg.nick
     new_nick = msg.params[-1]
+
+    if old_nick == bot.nick:
+        bot.nick = new_nick
     for channel in bot.channels:
         if old_nick in bot.channels[channel]:
             bot.channels[channel].discard(old_nick)
