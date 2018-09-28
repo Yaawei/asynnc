@@ -6,7 +6,6 @@ import peewee_async
 
 from nnc.core import plugin, protocol
 from nnc.core.db import BaseModel
-from nnc.core.channel import Channel
 
 _IRC_HANDLERS = collections.defaultdict(list)
 
@@ -44,7 +43,7 @@ class Bot:
         BaseModel._meta.database = db
         self.objects = peewee_async.Manager(db)
 
-        self.channel = Channel(channel=config.channels)
+        self.channels = collections.defaultdict(set)
 
     def send_raw(self, msg):
         self.protocol.write(msg)
@@ -136,22 +135,27 @@ def nickname_in_use(bot, msg):
 @irc(numeric='RPL_NAMREPLY')
 def on_namreply(bot, msg):
     users = msg.params[-1].split()
+    channel = msg.params[-2]
     for user in users:
-        bot.channel.add_user(user, msg.channel)
+        bot.channels[channel].add(user)
+
+
+@irc(cmd='JOIN')
+def on_join(bot, msg):
+    bot.channels[msg.channel].add(msg.nick)
 
 
 @irc(cmd='KICK')
 def on_kick(bot, msg):
     kicked_user = msg.params[-1]
-    bot.channel.remove_user(kicked_user, msg.channel)
+    bot.channels[msg.channel].discard(kicked_user)
+    if msg.nick == bot.config.nick:
+        del bot.channels[msg.channel]
 
 
 @irc(cmd='QUIT')
 @irc(cmd='PART')
 def on_part(bot, msg):
-    bot.channel.remove_user(msg.nick, msg.channel)
-
-
-@irc(cmd='JOIN')
-def on_join(bot, msg):
-    bot.channel.add_user(msg.nick, msg.channel)
+    bot.channels[msg.channel].discard(msg.nick)
+    if msg.nick == bot.config.nick:
+        del bot.channels[msg.channel]
