@@ -135,9 +135,8 @@ def nickname_in_use(bot, msg):
 @irc(numeric='RPL_NAMREPLY')
 def on_namreply(bot, msg):
     users = msg.params[-1].split()
-    channel = msg.params[-2]
-    for user in users:
-        bot.channels[channel].add(user)
+    channel = msg.params[2]
+    bot.channels[channel] = set(users)
 
 
 @irc(cmd='JOIN')
@@ -149,7 +148,7 @@ def on_join(bot, msg):
 def on_kick(bot, msg):
     kicked_user = msg.params[-1]
     bot.channels[msg.channel].discard(kicked_user)
-    if msg.nick == bot.config.nick:
+    if msg.nick == bot.nick:
         del bot.channels[msg.channel]
 
 
@@ -157,5 +156,15 @@ def on_kick(bot, msg):
 @irc(cmd='PART')
 def on_part(bot, msg):
     bot.channels[msg.channel].discard(msg.nick)
-    if msg.nick == bot.config.nick:
+    if msg.nick == bot.nick:
         del bot.channels[msg.channel]
+
+
+@irc(cmd='NICK')
+def on_nickname_change(bot, msg):
+    old_nick = msg.nick
+    new_nick = msg.params[-1]
+    for channel in bot.channels:
+        if old_nick in bot.channels[channel]:
+            bot.channels[channel].discard(old_nick)
+            bot.channels[channel].add(new_nick)
