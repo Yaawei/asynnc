@@ -6,6 +6,7 @@ import re
 
 CMD_HANDLERS = collections.defaultdict(dict)
 RE_HANDLERS = collections.defaultdict(lambda: collections.defaultdict(list))
+ONLOAD_HANDLERS = collections.defaultdict(list)
 
 
 def cmd(name, callback=None):
@@ -21,6 +22,10 @@ def regex(pattern, callback=None):
     pattern = re.compile(pattern)
     RE_HANDLERS[callback.__module__][pattern].append(callback)
     return callback
+
+
+def onload(fun):
+    ONLOAD_HANDLERS[fun.__module__].append(fun)
 
 
 def discover_builtins():

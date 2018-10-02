@@ -81,7 +81,10 @@ class Bot:
         self.loop.call_later(interval, self.connect)
 
     def load(self, mod):
-        self.modules[mod.__name__] = mod
+        name = mod.__name__
+        self.modules[name] = mod
+        for fun in plugin.ONLOAD_HANDLERS[name]:
+            self.schedule(fun)
 
     def unload(self, name):
         self.modules.pop(name)
