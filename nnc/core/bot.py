@@ -14,7 +14,7 @@ def irc(callback=None, numeric=None, cmd=None):
     if callback is None:
         return functools.partial(irc, numeric=numeric, cmd=cmd)
     if (numeric and cmd) or not (numeric or cmd):
-        raise ValueError('numeric or cmd')
+        raise ValueError("numeric or cmd")
     if numeric and not str.isnumeric(numeric):
         numeric = protocol.NUMERICS[numeric]
 
@@ -51,9 +51,9 @@ class Bot:
 
     def send(self, cmd, *params):
         params = list(params)
-        if ' ' in params[-1]:
-            params[-1] = ':' + params[-1]
-        self.protocol.write('%s %s' % (cmd, ' '.join(map(str, params))))
+        if " " in params[-1]:
+            params[-1] = ":" + params[-1]
+        self.protocol.write("%s %s" % (cmd, " ".join(map(str, params))))
 
     def handle(self, msg):
         for cb in _IRC_HANDLERS[msg.command]:
@@ -73,7 +73,7 @@ class Bot:
         )
 
     def connected(self):
-        self.send('USER', self.config.nick, 0, '*', self.config.nick)
+        self.send("USER", self.config.nick, 0, "*", self.config.nick)
         self.set_nick(self.config.nick)
 
     def disconnected(self):
@@ -90,7 +90,7 @@ class Bot:
         self.modules.pop(name)
 
     def say(self, target, text):
-        self.send('PRIVMSG', target, text)
+        self.send("PRIVMSG", target, text)
 
     def reply(self, msg, text):
         if msg.channel:
@@ -99,16 +99,16 @@ class Bot:
             self.say(msg.nick, text)
 
     def set_nick(self, nick):
-        self.send('NICK', nick)
+        self.send("NICK", nick)
         self.nick = nick
 
 
-@irc(cmd='PRIVMSG')
+@irc(cmd="PRIVMSG")
 async def dispatch_privmsg(bot, msg):
     text = msg.params[-1]
 
     if text.startswith(bot.config.cmd_trigger):
-        cmd = text[1:].split(' ', 1)[0]
+        cmd = text[1:].split(" ", 1)[0]
         for cmd_handlers in plugin.CMD_HANDLERS.values():
             if cmd in cmd_handlers:
                 bot.schedule(cmd_handlers[cmd], msg)
@@ -120,35 +120,35 @@ async def dispatch_privmsg(bot, msg):
                     bot.schedule(cb, msg)
 
 
-@irc(cmd='PING')
+@irc(cmd="PING")
 def pong(bot, msg):
-    bot.send('PONG', msg.params[-1])
+    bot.send("PONG", msg.params[-1])
 
 
-@irc(numeric='RPL_ENDOFMOTD')
+@irc(numeric="RPL_ENDOFMOTD")
 def join_channels(bot, msg):
     for channel in bot.config.channels:
-        bot.send('JOIN', channel)
+        bot.send("JOIN", channel)
 
 
-@irc(numeric='ERR_NICKNAMEINUSE')
+@irc(numeric="ERR_NICKNAMEINUSE")
 def nickname_in_use(bot, msg):
-    bot.set_nick(bot.nick + '_')
+    bot.set_nick(bot.nick + "_")
 
 
-@irc(numeric='RPL_NAMREPLY')
+@irc(numeric="RPL_NAMREPLY")
 def on_namreply(bot, msg):
     users = msg.params[-1].split()
     channel = msg.params[2]
     bot.channels[channel] = set(users)
 
 
-@irc(cmd='JOIN')
+@irc(cmd="JOIN")
 def on_join(bot, msg):
     bot.channels[msg.channel].add(msg.nick)
 
 
-@irc(cmd='KICK')
+@irc(cmd="KICK")
 def on_kick(bot, msg):
     kicked_user = msg.params[-1]
     bot.channels[msg.channel].discard(kicked_user)
@@ -156,15 +156,15 @@ def on_kick(bot, msg):
         del bot.channels[msg.channel]
 
 
-@irc(cmd='QUIT')
-@irc(cmd='PART')
+@irc(cmd="QUIT")
+@irc(cmd="PART")
 def on_part(bot, msg):
     bot.channels[msg.channel].discard(msg.nick)
     if msg.nick == bot.nick:
         del bot.channels[msg.channel]
 
 
-@irc(cmd='NICK')
+@irc(cmd="NICK")
 def on_nickname_change(bot, msg):
     old_nick = msg.nick
     new_nick = msg.params[-1]

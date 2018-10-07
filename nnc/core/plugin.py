@@ -32,7 +32,7 @@ def discover_builtins():
     import nnc.ext as builtins_pkg
 
     path = builtins_pkg.__path__
-    pkg_prefix = builtins_pkg.__package__ + '.'
+    pkg_prefix = builtins_pkg.__package__ + "."
 
     for mod in pkgutil.iter_modules(path, pkg_prefix):
         yield importlib.import_module(mod.name)

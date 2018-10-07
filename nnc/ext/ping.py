@@ -1,6 +1,6 @@
 from nnc.core.plugin import cmd
 
 
-@cmd('ping')
+@cmd("ping")
 async def pong(bot, msg):
-    bot.reply(msg, '%s: pong' % msg.nick)
+    bot.reply(msg, "%s: pong" % msg.nick)

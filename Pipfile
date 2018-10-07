@@ -11,6 +11,7 @@ peewee-async = "*"
 nnc = {editable = true, path = "."}
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.7"

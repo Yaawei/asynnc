@@ -10,7 +10,7 @@ class DbConfig:
     port: int
     password: str
 
-    def __init__(self, name, user=None, host='127.0.0.1', port=5432, password=None):
+    def __init__(self, name, user=None, host="127.0.0.1", port=5432, password=None):
         self.name = name
         self.user = user
         self.host = host
@@ -24,7 +24,7 @@ class Config:
     ssl: bool = True
     reconnection_interval: int = 60
 
-    encoding: str = 'utf-8'
+    encoding: str = "utf-8"
 
     nick: str
     cmd_trigger: str
@@ -34,21 +34,19 @@ class Config:
     db: DbConfig
 
     # https://docs.python.org/3/library/logging.config.html#logging-config-dictschema
-    logging: typing.Dict = {
-        'version': 1,
-    }
+    logging: typing.Dict = {"version": 1}
 
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        db = kwargs['db']
+        db = kwargs["db"]
         self.db = DbConfig(
-            name=db.pop('name'),
-            user=db.pop('user', None),
-            host=db.pop('host', '127.0.0.1'),
-            port=db.pop('port', 5432),
-            password=db.pop('password', None),
+            name=db.pop("name"),
+            user=db.pop("user", None),
+            host=db.pop("host", "127.0.0.1"),
+            port=db.pop("port", 5432),
+            password=db.pop("password", None),
         )
         self.channels = self.channels or []
 

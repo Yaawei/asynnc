@@ -11,7 +11,7 @@ def main():
     try:
         config_path = sys.argv[1]
     except IndexError:
-        config_path = 'config.toml'
+        config_path = "config.toml"
 
     config = Config.from_toml(config_path)
 
@@ -19,10 +19,7 @@ def main():
 
     loop = asyncio.get_event_loop()
 
-    bot = Bot(
-        config=config,
-        loop=loop,
-    )
+    bot = Bot(config=config, loop=loop)
 
     for mod in discover_builtins():
         bot.load(mod)
