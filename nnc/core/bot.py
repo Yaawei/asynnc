@@ -88,6 +88,12 @@ class Bot:
 
     def unload(self, name):
         self.modules.pop(name)
+        for handlers in (
+            plugin.CMD_HANDLERS,
+            plugin.RE_HANDLERS,
+            plugin.ONLOAD_HANDLERS,
+        ):
+            handlers.pop(name, None)
 
     def say(self, target, text):
         self.send("PRIVMSG", target, text)
