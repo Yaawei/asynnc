@@ -78,7 +78,8 @@ async def save_remind(bot, msg):
 
 
 def send_memo(bot, memo):
-    if memo.recipient not in bot.channels[memo.channel] \
+    stripped_users = [user.lower().strip("@_") for user in bot.channels[memo.channel]]
+    if memo.recipient.lower().strip("@_") not in stripped_users \
             or memo.delivery_time > datetime.datetime.now():
         bot.loop.call_later(60, send_memo, bot, memo)
     else:
