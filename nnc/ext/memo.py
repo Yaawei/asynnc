@@ -50,7 +50,7 @@ async def save_memo(bot, msg):
 async def save_remind(bot, msg):
     contents = msg.params[-1].split(' ', 3)
     if len(contents) == 4:
-        recipient = contents[1].lower()
+        recipient = contents[1]
         message = contents[3]
         delivery_time, delivery_time_delta = parse_time(contents[2])
         sender = msg.nick.rstrip('_')
@@ -84,8 +84,9 @@ def send_memo(bot, memo):
         bot.loop.call_later(60, send_memo, bot, memo)
     else:
         bot.say(memo.channel,
-                '%s (from %s on %s)' % (
+                '%s (to %s, from %s on %s)' % (
                     memo.message,
+                    memo.recipient,
                     memo.sender,
                     memo.sent_at.strftime("%H:%M, %e %b %Y"),
                  ))
