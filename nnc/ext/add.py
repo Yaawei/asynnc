@@ -14,7 +14,6 @@ class Add(BaseModel):
 
 
 @cmd("add")
-@cmd("add")
 async def save_entry(bot, msg):
     msg_contents = msg.params[-1].split(" ", 2)
     if len(msg_contents) != 3:
@@ -34,7 +33,7 @@ async def save_entry(bot, msg):
         return
 
     await bot.objects.create(Add, keyword=keyword, content=content, date=date)
-    bot.reply(msg, "successfully added entry")
+    bot.reply(msg, "Successfully added entry")
 
 
 @irc(cmd="PRIVMSG")
