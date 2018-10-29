@@ -6,6 +6,7 @@ import peewee_async
 
 from nnc.core import plugin, protocol
 from nnc.core.db import BaseModel
+from nnc.core.plugin import cmd
 
 _IRC_HANDLERS = collections.defaultdict(list)
 
@@ -45,6 +46,8 @@ class Bot:
         self.objects = peewee_async.Manager(db)
 
         self.channels = collections.defaultdict(set)
+
+        self.msg_buffer = []
 
     def send_raw(self, msg):
         self.protocol.write(msg)
@@ -107,6 +110,20 @@ class Bot:
     def set_nick(self, nick):
         self.send("NICK", nick)
         self.nick = nick
+
+    def send_many(self, target, messages):
+        self.msg_buffer = messages
+        messages_sent = 2
+        for msg in self.msg_buffer[:messages_sent]:
+            self.say(target, msg)
+
+        self.msg_buffer = self.msg_buffer[messages_sent:]
+        if self.msg_buffer:
+            self.say(
+                target,
+                "There are %s more messages in the buffer, type %smore too see the next %s"
+                % (len(self.msg_buffer), self.config.cmd_trigger, messages_sent),
+            )
 
 
 @irc(cmd="PRIVMSG")
@@ -181,3 +198,11 @@ def on_nickname_change(bot, msg):
         if old_nick in bot.channels[channel]:
             bot.channels[channel].discard(old_nick)
             bot.channels[channel].add(new_nick)
+
+
+@cmd("more")
+def more(bot, msg):
+    if bot.msg_buffer:
+        bot.send_many(msg.channel or msg.nick, bot.msg_buffer)
+    else:
+        bot.reply(msg, "¡less")
