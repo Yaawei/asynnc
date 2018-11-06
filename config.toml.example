@@ -10,6 +10,8 @@ cmd_trigger = '!'
 
 channels = ["#nnc"]
 
+yt_api_key = "youtube_api_key"
+
 [db]
 name = "db_name"
 user = "user"
