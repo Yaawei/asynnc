@@ -9,6 +9,9 @@ peewee = "*"
 aiopg = "*"
 peewee-async = "*"
 nnc = {editable = true, path = "."}
+aiohttp = "*"
+cchardet = "*"
+aiodns = "*"
 
 [dev-packages]
 black = "*"
