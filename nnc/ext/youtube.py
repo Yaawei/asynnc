@@ -1,5 +1,4 @@
 import re
-from urllib.parse import quote
 
 import aiohttp
 
@@ -14,12 +13,11 @@ async def describe_video(bot, msg):
     link_pattern2 = "youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})"
     video_id = re.search(link_pattern1, message) or re.search(link_pattern2, message)
     if video_id:
-        part = quote("snippet,contentDetails")
         async with aiohttp.request(
             "GET",
             "https://www.googleapis.com/youtube/v3/videos/?",
             params={
-                "part": part,
+                "part": "snippet,contentDetails",
                 "id": video_id.group(1),
                 "key": bot.config.yt_api_key,
             },
@@ -47,14 +45,13 @@ async def youtube_search(bot, msg):
         )
         return
 
-    query_string = quote(search_words[-1])
     async with aiohttp.request(
         "GET",
         "https://www.googleapis.com/youtube/v3/search?",
         params={
             "part": "snippet",
             "maxResults": results_count,
-            "q": query_string,
+            "q": search_words[-1],
             "key": bot.config.yt_api_key,
         },
     ) as resp:
