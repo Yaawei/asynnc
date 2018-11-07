@@ -1,5 +1,5 @@
-import json
 import re
+from urllib.parse import quote
 
 import aiohttp
 
@@ -8,22 +8,23 @@ from nnc.core.plugin import regex, cmd
 
 @regex("youtu\.be/([a-zA-Z0-9_-]{11})")
 @regex("youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})")
-async def dispatch_msg(bot, msg):
+async def describe_video(bot, msg):
     message = msg.params[-1]
     link_pattern1 = "youtu\.be/([a-zA-Z0-9_-]{11})"
     link_pattern2 = "youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})"
     video_id = re.search(link_pattern1, message) or re.search(link_pattern2, message)
-    if not video_id:
+    if video_id:
+        part = quote("snippet,contentDetails")
         async with aiohttp.request(
             "GET",
             "https://www.googleapis.com/youtube/v3/videos/?",
             params={
-                "part": "snippet%2CcontentDetails",
+                "part": part,
                 "id": video_id.group(1),
                 "key": bot.config.yt_api_key,
             },
         ) as resp:
-            video_info = json.loads(await resp.text())
+            video_info = await resp.json()
             title = video_info["items"][0]["snippet"]["title"]
             author = video_info["items"][0]["snippet"]["channelTitle"]
             duration = video_info["items"][0]["contentDetails"]["duration"].lstrip("PT")
@@ -32,7 +33,7 @@ async def dispatch_msg(bot, msg):
 
 
 @cmd("yt")
-async def yt_search(bot, msg):
+async def youtube_search(bot, msg):
     results_count = 10
     message = msg.params[-1]
     search_words = message.split(" ", 1)
@@ -46,7 +47,7 @@ async def yt_search(bot, msg):
         )
         return
 
-    query_string = search_words[-1].replace(" ", "%20")
+    query_string = quote(search_words[-1])
     async with aiohttp.request(
         "GET",
         "https://www.googleapis.com/youtube/v3/search?",
@@ -57,7 +58,7 @@ async def yt_search(bot, msg):
             "key": bot.config.yt_api_key,
         },
     ) as resp:
-        search_results = json.loads(await resp.text())
+        search_results = await resp.json()
         results = []
         for item in search_results["items"]:
             if item["id"]["kind"] == "youtube#video":
