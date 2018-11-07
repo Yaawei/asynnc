@@ -63,7 +63,6 @@ async def yt_search(bot, msg):
             if item["id"]["kind"] == "youtube#video":
                 item_id = item["id"]["videoId"]
                 item_url = "https://youtu.be/" + item_id
-                print(item_url)
             elif item["id"]["kind"] == "youtube#playlist":
                 item_id = item["id"]["playlistId"]
                 item_url = "https://www.youtube.com/playlist?list=" + item_id
