@@ -1,5 +1,6 @@
 import datetime
 import asyncio
+import re
 
 import peewee
 
@@ -53,7 +54,7 @@ async def save_remind(bot, msg):
         bot.reply(
             msg,
             "Wrong number of arguments. The correct format is - "
-            "!remind <recipient>(e.g. JohnDoe) <time>(e.g. 2d,4h,15m,35s) <message>",
+            "!remind <recipient>(e.g. JohnDoe) <time>(e.g. 2d4h15m35s) <message>",
         )
         return
 
@@ -111,7 +112,7 @@ async def load_memo_from_db(bot):
 
 def parse_time(time_str):
     legal_letters = ["h", "d", "s", "m"]
-    time_split = time_str.split(",")
+    time_split = re.findall(r"\d+\w", time_str)
     times = {
         x[-1]: int(x[:-1])
         for x in time_split
