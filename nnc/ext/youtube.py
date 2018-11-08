@@ -1,6 +1,7 @@
 import re
 
 import aiohttp
+from isodate import parse_duration
 
 from nnc.core.plugin import regex, cmd
 
@@ -25,9 +26,9 @@ async def describe_video(bot, msg):
             video_info = await resp.json()
             title = video_info["items"][0]["snippet"]["title"]
             author = video_info["items"][0]["snippet"]["channelTitle"]
-            duration = video_info["items"][0]["contentDetails"]["duration"].lstrip("PT")
+            duration = parse_duration(video_info["items"][0]["contentDetails"]["duration"])
 
-            bot.reply(msg, "%s (%s) by %s" % (title, duration, author))
+            bot.reply(msg, "%s (%s) by %s" % (title, str(duration), author))
 
 
 @cmd("yt")

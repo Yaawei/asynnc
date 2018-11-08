@@ -12,6 +12,7 @@ nnc = {editable = true, path = "."}
 aiohttp = "*"
 cchardet = "*"
 aiodns = "*"
+isodate = "*"
 
 [dev-packages]
 black = "*"
