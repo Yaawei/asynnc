@@ -10,11 +10,11 @@ from nnc.core.plugin import regex
 current_token = collections.defaultdict(str)
 
 
-async def request_authorization():
+async def request_authorization(client_id, client_secret):
     async with aiohttp.request(
             "POST",
             "https://accounts.spotify.com/api/token",
-            auth=aiohttp.BasicAuth("57a6be682bbf4be5be98c0d01e68049d", "1459804e285c4a8e9429c6154672941d"),
+            auth=aiohttp.BasicAuth(client_id, client_secret),
             data={"grant_type": "client_credentials"}) as resp:
         reply = await resp.json()
         token = reply['access_token']
@@ -23,9 +23,9 @@ async def request_authorization():
         current_token["expiration"] = expiration
 
 
-async def get_info(subject, subject_id, token=None, expiration=None):
+async def get_info(client_id, client_secret,  subject, subject_id, token=None, expiration=None):
     if not token or not expiration or expiration < datetime.datetime.now():
-        await request_authorization()
+        await request_authorization(client_id, client_secret)
 
     url = "https://api.spotify.com/v1/%s/%s" % (subject, subject_id)
     async with aiohttp.request(
@@ -44,6 +44,8 @@ async def describe_subject(bot, msg):
     subject = "%ss" % uri.group(1)
 
     data = await get_info(
+        client_id=bot.config.spotify_client_id,
+        client_secret=bot.config.spotify_client_secret,
         subject=subject,
         subject_id=uri.group(2),
         token=current_token["token"] or None,
