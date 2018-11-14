@@ -119,7 +119,7 @@ def parse_time(time_str):
         """, re.X)
 
     mo = re.match(pat, time_str)
-    timedict = {k: int(v) for k, v in mo.groupdict().items() if isinstance(v, str)}
+    timedict = {k: int(v) for k, v in mo.groupdict().items() if v}
     if timedict:
         delivery_time_delta = datetime.timedelta(**timedict)
         delivery_time = datetime.datetime.now() + delivery_time_delta
