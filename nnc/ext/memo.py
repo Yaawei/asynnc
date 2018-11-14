@@ -111,23 +111,18 @@ async def load_memo_from_db(bot):
 
 
 def parse_time(time_str):
-    legal_letters = ["h", "d", "s", "m"]
-    time_split = re.findall(r"\d+\w", time_str)
-    times = {
-        x[-1]: int(x[:-1])
-        for x in time_split
-        if x and x[-1] in legal_letters and x[:-1].isdigit()
-    }
-    if times:
-        for let in legal_letters:
-            if let not in times.keys():
-                times[let] = 0
+    pat = re.compile(r"""
+        (?:(?P<days>\d+)d(?:ays?|ni)?)?     
+        (?:(?P<hours>\d+)h(?:ours?)?)?
+        (?:(?P<minutes>\d+)m(?:inu?t?)?)?
+        (?:(?P<seconds>\d+)s(?:e(?:k|c))?)?
+        """, re.X)
 
-        delivery_time_delta = datetime.timedelta(
-            days=times["d"], hours=times["h"], minutes=times["m"], seconds=times["s"]
-        )
+    mo = re.match(pat, time_str)
+    timedict = {k: int(v) for k, v in mo.groupdict().items() if isinstance(v, str)}
+    if timedict:
+        delivery_time_delta = datetime.timedelta(**timedict)
         delivery_time = datetime.datetime.now() + delivery_time_delta
-
         return delivery_time, delivery_time_delta
     else:
         delivery_time = datetime.datetime.now()
