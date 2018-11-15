@@ -9,6 +9,7 @@ peewee = "*"
 aiopg = "*"
 peewee-async = "*"
 nnc = {editable = true, path = "."}
+"beautifulsoup4" = "*"
 
 [dev-packages]
 black = "*"
