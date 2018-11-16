@@ -2,6 +2,7 @@ import asyncio
 import collections
 import functools
 
+import aiohttp
 import peewee_async
 
 from nnc.core import plugin, protocol
@@ -48,6 +49,8 @@ class Bot:
         self.channels = collections.defaultdict(set)
 
         self.msg_buffer = []
+
+        self.session = aiohttp.ClientSession()
 
     def send_raw(self, msg):
         self.protocol.write(msg)
